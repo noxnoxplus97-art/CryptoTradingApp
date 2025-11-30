@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html ng-app="tradingApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Trading System</title>
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body ng-controller="MainController">
+    <div class="container-fluid">
+        <!-- Navigation Bar -->
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#/">
+                        <i class="fa fa-bitcoin"></i> Crypto Trading System
+                    </a>
+                    <span class="navbar-text" style="color:#fff; margin-left:12px;">
+                        <small ng-if="isLoggedIn">Signed in as {{currentUser}}</small>
+                        <small ng-if="!isLoggedIn">Not signed in</small>
+                    </span>
+                </div>
+                <div id="navbar" class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav navbar-right" ng-show="isLoggedIn">
+                        <li><a href="#/dashboard"><i class="fa fa-dashboard"></i> Dashboard</a></li>
+                        <li><a href="#/trade"><i class="fa fa-exchange"></i> Trade</a></li>
+                        <li><a href="#/history"><i class="fa fa-history"></i> History</a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <i class="fa fa-user"></i> {{currentUser}} <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#/account"><i class="fa fa-cog"></i> Account Details</a></li>
+                                <li class="divider"></li>
+                                <li><a ng-click="logout()"><i class="fa fa-sign-out"></i> Logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content" ng-view></div>
+    </div>
+
+    <!-- Angular JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-route.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    
+    <!-- Application JS -->
+    <script src="js/app.js"></script>
+    <script src="js/controllers/mainController.js"></script>
+    <script src="js/controllers/loginController.js"></script>
+    <script src="js/controllers/dashboardController.js"></script>
+    <script src="js/controllers/tradeController.js"></script>
+    <script src="js/controllers/historyController.js"></script>
+    <script src="js/controllers/accountController.js"></script>
+    <script src="js/services/apiService.js"></script>
+    <script src="js/services/authService.js"></script>
+</body>
+</html>

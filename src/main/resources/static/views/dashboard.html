@@ -1,0 +1,107 @@
+<div class="dashboard-container">
+    <div class="page-header">
+        <h2><i class="fa fa-dashboard"></i> Dashboard</h2>
+        <p>Portfolio Overview & Market Prices</p>
+    </div>
+
+    <div ng-if="error" class="alert alert-danger alert-dismissible" role="alert">
+        <button type="button" class="close" ng-click="error = null">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        {{error}}
+    </div>
+
+    <!-- Wallet Summary -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <i class="fa fa-wallet"></i> Wallet Balance
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row text-center">
+                        <div class="col-md-6">
+                            <h4>Total Balance (USD)</h4>
+                            <h2 class="text-success">
+                                <strong>${{totalWalletValue | number:2}}</strong>
+                            </h2>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-sm btn-info" ng-click="refreshWallet()">
+                                <i class="fa fa-refresh" ng-class="{spin: refreshing}"></i> 
+                                Refresh
+                            </button>
+                        </div>
+                    </div>
+
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Asset</th>
+                                <th>Balance</th>
+                                <th>Available</th>
+                                <th>USD Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="wallet in wallet.holdings">
+                                <td>
+                                    <strong>{{wallet.symbol}}</strong>
+                                </td>
+                                <td>{{wallet.totalBalance | number:8}}</td>
+                                <td>{{wallet.availableBalance | number:8}}</td>
+                                <td class="text-right">
+                                    ${{wallet.totalBalance * getPrice(wallet.symbol) | number:2}}
+                                </td>
+                            </tr>
+                            <tr ng-if="!wallet.holdings || wallet.holdings.length === 0">
+                                <td colspan="4" class="text-center">No wallets found</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Current Market Prices -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <i class="fa fa-line-chart"></i> Current Market Prices
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div ng-repeat="(symbol, price) in latestPrices" class="col-md-6">
+                            <div class="price-card">
+                                <div class="price-symbol">{{symbol}}</div>
+                                <div class="price-display">
+                                    <span class="price-value">${{price.bid | number:2}}</span>
+                                    <small class="text-muted">Bid</small>
+                                </div>
+                                <div class="price-display">
+                                    <span class="price-value">${{price.ask | number:2}}</span>
+                                    <small class="text-muted">Ask</small>
+                                </div>
+                                <div class="price-spread">
+                                    Spread: {{((price.ask - price.bid) / price.bid * 100) | number:4}}%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center text-muted">
+        <small>Last updated: {{lastUpdate | date:'HH:mm:ss'}}</small>
+        <br>
+        <small>Auto-refreshing every 10 seconds</small>
+    </div>
+</div>

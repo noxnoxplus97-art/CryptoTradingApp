@@ -1,0 +1,291 @@
+<div class="account-container">
+    <div class="page-header">
+        <h2><i class="fa fa-user"></i> Account Details</h2>
+        <p>Wallet & Portfolio Information</p>
+    </div>
+
+    <div ng-if="error" class="alert alert-danger alert-dismissible" role="alert">
+        <button type="button" class="close" ng-click="error = null">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        {{error}}
+    </div>
+
+    <!-- Account Summary -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <i class="fa fa-user-circle"></i> User Information
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p>
+                                <strong>Username:</strong><br>
+                                {{currentUser}}
+                            </p>
+                            <p>
+                                <strong>Member Since:</strong><br>
+                                <span ng-if="accountDetails.createdDate">
+                                    {{accountDetails.createdDate | date:'MMMM d, yyyy'}}
+                                </span>
+                                <span ng-if="!accountDetails.createdDate">Account creation date not available</span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-default pull-right" ng-click="refreshAccount()">
+                                <i class="fa fa-refresh" ng-class="{spin: refreshing}"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Portfolio Summary -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <i class="fa fa-briefcase"></i> Portfolio Summary
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="summary-box">
+                                <div class="summary-label">Total Assets (USD)</div>
+                                <div class="summary-value text-success">
+                                    ${{totalWalletValue | number:2}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="summary-box">
+                                <div class="summary-label">Total Available (USD)</div>
+                                <div class="summary-value text-info">
+                                    ${{totalAvailable | number:2}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="summary-box">
+                                <div class="summary-label">Asset Count</div>
+                                <div class="summary-value">
+                                    {{wallet.holdings ? wallet.holdings.length : 0}} Assets
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="summary-box">
+                                <div class="summary-label">Largest Position</div>
+                                <div class="summary-value">
+                                    {{largestPosition.symbol || 'N/A'}}
+                                </div>
+                                <small class="text-muted">{{largestPosition.percentage | number:1}}%</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Wallet Breakdown -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <i class="fa fa-list"></i> Wallet Breakdown
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Asset</th>
+                                    <th>Total Balance</th>
+                                    <th>Available Balance</th>
+                                    <th>Locked Balance</th>
+                                    <th>USD Value</th>
+                                    <th>% of Portfolio</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="holding in wallet.holdings">
+                                    <td>
+                                        <strong>{{holding.symbol}}</strong>
+                                        <br>
+                                        <small class="text-muted">{{getSymbolName(holding.symbol)}}</small>
+                                    </td>
+                                    <td class="text-right">
+                                        {{holding.totalBalance | number:8}}
+                                    </td>
+                                    <td class="text-right">
+                                        {{holding.availableBalance | number:8}}
+                                    </td>
+                                    <td class="text-right">
+                                        <strong>{{(holding.totalBalance - holding.availableBalance) | number:8}}</strong>
+                                    </td>
+                                    <td class="text-right">
+                                        ${{holding.totalBalance * getPrice(holding.symbol) | number:2}}
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="margin-bottom: 0;">
+                                            <div class="progress-bar progress-bar-success" 
+                                                 style="width: {{(holding.totalBalance * getPrice(holding.symbol)) / totalWalletValue * 100}}%"
+                                                 ng-if="totalWalletValue > 0">
+                                                {{(holding.totalBalance * getPrice(holding.symbol)) / totalWalletValue * 100 | number:1}}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr ng-if="!wallet.holdings || wallet.holdings.length === 0">
+                                    <td colspan="6" class="text-center text-muted">
+                                        <i class="fa fa-inbox"></i> No wallets found
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Asset Distribution Chart Info -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <i class="fa fa-pie-chart"></i> Asset Distribution
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row" ng-if="wallet.holdings && wallet.holdings.length > 0">
+                        <div ng-repeat="holding in wallet.holdings" class="col-md-4">
+                            <div class="distribution-card">
+                                <div class="dist-symbol">{{holding.symbol}}</div>
+                                <div class="dist-percentage">
+                                    {{(holding.totalBalance * getPrice(holding.symbol)) / totalWalletValue * 100 | number:2}}%
+                                </div>
+                                <div class="dist-value">
+                                    ${{holding.totalBalance * getPrice(holding.symbol) | number:2}}
+                                </div>
+                                <div class="progress" style="margin-bottom: 0;">
+                                    <div class="progress-bar" 
+                                         style="width: {{(holding.totalBalance * getPrice(holding.symbol)) / totalWalletValue * 100}}%; background-color: {{getColorForSymbol(holding.symbol)}};">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div ng-if="!wallet.holdings || wallet.holdings.length === 0" class="text-center text-muted">
+                        <i class="fa fa-inbox"></i> No assets to display
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trading Activity Summary -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <i class="fa fa-bar-chart"></i> Trading Activity
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="activity-stat">
+                                <small class="text-muted">Total Trades</small>
+                                <h3>{{tradeStats.total}}</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="activity-stat success">
+                                <small class="text-muted">Buy Orders</small>
+                                <h3 class="text-success">{{tradeStats.buy}}</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="activity-stat danger">
+                                <small class="text-muted">Sell Orders</small>
+                                <h3 class="text-danger">{{tradeStats.sell}}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center text-muted" style="margin-top: 20px;">
+        <small>Last updated: {{lastUpdate | date:'HH:mm:ss'}}</small>
+    </div>
+</div>
+
+<style>
+    .summary-box {
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 4px;
+        border-left: 4px solid #5cb85c;
+        margin-bottom: 10px;
+    }
+    .summary-label {
+        font-size: 12px;
+        color: #999;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }
+    .summary-value {
+        font-size: 28px;
+        font-weight: bold;
+    }
+    .distribution-card {
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+    .dist-symbol {
+        font-weight: bold;
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+    .dist-percentage {
+        font-size: 20px;
+        font-weight: bold;
+        color: #5cb85c;
+    }
+    .dist-value {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 10px;
+    }
+    .activity-stat {
+        padding: 15px;
+        background-color: #f9f9f9;
+        border-radius: 4px;
+        text-align: center;
+    }
+    .activity-stat.success {
+        background-color: #dff0d8;
+    }
+    .activity-stat.danger {
+        background-color: #f2dede;
+    }
+</style>

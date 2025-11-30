@@ -1,0 +1,177 @@
+<div class="trade-container">
+    <div class="page-header">
+        <h2><i class="fa fa-exchange"></i> Trading</h2>
+        <p>Execute Buy/Sell Orders</p>
+    </div>
+
+    <div ng-if="error" class="alert alert-danger alert-dismissible" role="alert">
+        <button type="button" class="close" ng-click="error = null">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <i class="fa fa-exclamation-circle"></i> {{error}}
+    </div>
+
+    <div ng-if="success" class="alert alert-success alert-dismissible" role="alert">
+        <button type="button" class="close" ng-click="success = null">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <i class="fa fa-check-circle"></i> {{success}}
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <i class="fa fa-shopping-cart"></i> Execute Trade
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <form ng-submit="executeTrade()" class="trade-form">
+                        <!-- Trade Type Selection -->
+                        <div class="form-group">
+                            <label>Trade Type</label>
+                            <div class="btn-group btn-group-justified" role="group">
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-success"
+                                            ng-model="tradeForm.type" 
+                                            btn-radio="'BUY'"
+                                            ng-click="loadPrice()">
+                                        <i class="fa fa-arrow-up"></i> BUY
+                                    </button>
+                                </div>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-danger"
+                                            ng-model="tradeForm.type" 
+                                            btn-radio="'SELL'"
+                                            ng-click="loadPrice()">
+                                        <i class="fa fa-arrow-down"></i> SELL
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Symbol Selection -->
+                        <div class="form-group">
+                            <label for="symbol">Cryptocurrency</label>
+                            <select class="form-control" id="symbol" 
+                                    ng-model="tradeForm.symbol" 
+                                    ng-change="loadPrice()"
+                                    required>
+                                <option value="">-- Select --</option>
+                                <option value="ETHUSDT">ETH/USDT (Ethereum)</option>
+                                <option value="BTCUSDT">BTC/USDT (Bitcoin)</option>
+                            </select>
+                        </div>
+
+                        <!-- Current Price Display -->
+                        <div ng-if="currentPrice" class="alert alert-info">
+                            <strong>Current {{tradeForm.type === 'BUY' ? 'Ask' : 'Bid'}} Price:</strong>
+                            <span class="pull-right text-success">
+                                ${{(tradeForm.type === 'BUY' ? currentPrice.ask : currentPrice.bid) | number:2}}
+                            </span>
+                        </div>
+
+                        <!-- Quantity Input -->
+                        <div class="form-group">
+                            <label for="quantity">Quantity ({{tradeForm.symbol || 'Symbol'}})</label>
+                            <input type="number" class="form-control" id="quantity" 
+                                   ng-model="tradeForm.quantity" 
+                                   placeholder="Enter quantity"
+                                   step="0.00000001"
+                                   min="0"
+                                   ng-change="calculateTotal()"
+                                   required>
+                            <small class="text-muted">Step: 0.00000001</small>
+                        </div>
+
+                        <!-- Price Display -->
+                        <div class="form-group">
+                            <label for="price">Unit Price</label>
+                            <input type="text" class="form-control" id="price" 
+                                   value="{{(tradeForm.type === 'BUY' ? currentPrice.ask : currentPrice.bid) | number:2}}" 
+                                   readonly>
+                        </div>
+
+                        <!-- Total Amount -->
+                        <div class="form-group">
+                            <label for="total">Total Amount (USD)</label>
+                            <input type="text" class="form-control input-lg" id="total" 
+                                   value="${{totalAmount | number:2}}" 
+                                   readonly
+                                   style="font-size: 18px; font-weight: bold;">
+                        </div>
+
+                        <!-- Available Balance -->
+                        <div ng-if="availableBalance !== undefined" class="alert alert-warning">
+                            <strong>Available USDT Balance:</strong>
+                            <span class="pull-right">${{availableBalance | number:2}}</span>
+                        </div>
+
+                        <!-- Validation Messages -->
+                        <div ng-if="validationError" class="alert alert-warning">
+                            <i class="fa fa-warning"></i> {{validationError}}
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-lg btn-block"
+                                ng-class="{'btn-success': tradeForm.type === 'BUY', 'btn-danger': tradeForm.type === 'SELL'}"
+                                ng-disabled="loading || !tradeForm.type || !tradeForm.symbol || !tradeForm.quantity">
+                            <i class="fa" ng-class="{'fa-download': tradeForm.type === 'BUY', 'fa-upload': tradeForm.type === 'SELL'}"></i>
+                            <span ng-if="!loading">
+                                {{tradeForm.type}} {{tradeForm.quantity | number:8}} {{tradeForm.symbol}}
+                            </span>
+                            <span ng-if="loading">
+                                <i class="fa fa-spinner fa-spin"></i> Processing...
+                            </span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Trades Summary -->
+    <div class="row" ng-if="recentTrades && recentTrades.length > 0">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <i class="fa fa-history"></i> Recent Trades (Last 5)
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <table class="table table-striped table-condensed">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Type</th>
+                                <th>Symbol</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="trade in recentTrades | limitTo:5">
+                                <td>{{trade.timestamp | date:'HH:mm:ss'}}</td>
+                                <td>
+                                    <span ng-if="trade.tradeType === 'BUY'" class="label label-success">
+                                        <i class="fa fa-arrow-up"></i> BUY
+                                    </span>
+                                    <span ng-if="trade.tradeType === 'SELL'" class="label label-danger">
+                                        <i class="fa fa-arrow-down"></i> SELL
+                                    </span>
+                                </td>
+                                <td><strong>{{trade.symbol}}</strong></td>
+                                <td>{{trade.quantity | number:8}}</td>
+                                <td>${{trade.price | number:2}}</td>
+                                <td>${{trade.totalAmount | number:2}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
