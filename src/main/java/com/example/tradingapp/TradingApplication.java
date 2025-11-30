@@ -2,12 +2,14 @@ package com.example.tradingapp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-public class TradingAppApplication {
+@EnableScheduling
+public class TradingApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(TradingAppApplication.class, args);
+        SpringApplication.run(TradingApplication.class, args);
     }
 
 }

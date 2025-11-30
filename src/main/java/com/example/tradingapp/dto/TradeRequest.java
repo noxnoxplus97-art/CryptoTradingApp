@@ -9,9 +9,8 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Wallet {
-    private Long id;
-    private String currency;
-    private BigDecimal balance;
-    private BigDecimal availableBalance;
+public class TradeRequest {
+    private String symbol;
+    private String type;
+    private BigDecimal quantity;
 }
