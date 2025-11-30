@@ -1,6 +1,5 @@
-# trading-app
-
-Simple Spring Boot starter project for TradingApp.
+# CryptoTradingApp
+A simple Crypto Trading application with SpringBoot framework and in memory H2 Database.
 
 Requirements
 - Java 17+
