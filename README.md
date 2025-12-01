@@ -10,7 +10,7 @@ A Spring Boot-based cryptocurrency trading application that aggregates real-time
    - Fetches prices from Binance: `https://api.binance.com/api/v3/ticker/bookTicker`
    - Fetches prices from Huobi: `https://api.huobi.pro/market/tickers`
    - Stores best bid/ask prices in the H2 database
-   - Bid price used for Buy orders, Ask price used for Sell orders
+   - Bid Price use for SELL order, Ask Price use for BUY order
 
 2. **Trading Operations**
    - BUY: Deduct USDT, add cryptocurrency at the current ask price
