@@ -1,4 +1,4 @@
-# Crypto Trading System - Spring Boot Application
+# Crypto Trading System - Spring Boot Application with H2 Database
 
 ## Overview
 
