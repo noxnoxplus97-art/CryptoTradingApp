@@ -1,16 +1,16 @@
 package com.example.tradingapp.dto;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Trade {
+public class TradeDTO {
     private Long id;
     private String symbol;
     private String type;

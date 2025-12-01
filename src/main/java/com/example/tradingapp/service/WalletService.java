@@ -1,6 +1,7 @@
 package com.example.tradingapp.service;
 
-import com.example.tradingapp.dto.Wallet;
+import com.example.tradingapp.dto.WalletDTO;
+import com.example.tradingapp.entity.Wallet;
 import com.example.tradingapp.entity.User;
 import com.example.tradingapp.repository.WalletRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -17,19 +18,19 @@ public class WalletService {
     @Autowired
     private WalletRepository walletRepository;
 
-    public List<Wallet> getUserWallets(User user) {
-        List<com.example.tradingapp.entity.Wallet> wallets = walletRepository.findByUser(user);
+    public List<WalletDTO> getUserWallets(User user) {
+        List<Wallet> wallets = walletRepository.findByUser(user);
         return wallets.stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
-    public Wallet getWalletByCurrency(User user, String currency) {
-        com.example.tradingapp.entity.Wallet wallet = walletRepository.findByUserAndCurrency(user, currency)
+    public WalletDTO getWalletByCurrency(User user, String currency) {
+        Wallet wallet = walletRepository.findByUserAndCurrency(user, currency)
                 .orElseThrow(() -> new RuntimeException("Wallet not found for currency: " + currency));
         return mapToDto(wallet);
     }
 
-    private Wallet mapToDto(com.example.tradingapp.entity.Wallet entity) {
-        Wallet dto = new Wallet();
+    private WalletDTO mapToDto(Wallet entity) {
+        WalletDTO dto = new WalletDTO();
         dto.setId(entity.getId());
         dto.setCurrency(entity.getCurrency());
         dto.setBalance(entity.getBalance());

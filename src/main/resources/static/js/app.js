@@ -2,7 +2,10 @@
 var tradingApp = angular.module('tradingApp', ['ngRoute']);
 
 // Configure routes
-tradingApp.config(['$routeProvider', function($routeProvider) {
+tradingApp.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
+    // Use empty hashPrefix so routes use "#/path" instead of "#!/path" (avoid double-hash redirects)
+    $locationProvider.hashPrefix('');
+
     $routeProvider
         .when('/login', {
             templateUrl: 'views/login.html',
@@ -63,19 +66,16 @@ tradingApp.run(['$rootScope', '$location', 'AuthService', function($rootScope, $
         var isProtected = protectedRoutes.indexOf(routePath) !== -1;
         
         if (isProtected) {
-            // Check auth directly from localStorage to avoid stale state
-            var authFlag = localStorage.getItem('isAuthenticated');
-            var isAuth = authFlag === 'true';
-            
-            console.debug('[RouteGuard] Route:', routePath, 'Protected:', isProtected, 'Auth:', isAuth, 'LocalStorage:', authFlag);
-            
-            if (!isAuth) {
+            // Use AuthService.requireLogin() to centralize auth check and avoid
+            // relying on direct localStorage reads here (prevents stale logic).
+            AuthService.requireLogin().then(function(user) {
+                // Auth resolved; allow route
+                console.debug('[RouteGuard] ALLOWING route - authenticated', user);
+            }).catch(function() {
+                // Not authenticated: prevent navigation (AuthService will redirect)
                 console.warn('[RouteGuard] BLOCKING route - not authenticated');
                 event.preventDefault();
-                $location.path('/login');
-            } else {
-                console.debug('[RouteGuard] ALLOWING route - authenticated');
-            }
+            });
         }
     });
 }]);

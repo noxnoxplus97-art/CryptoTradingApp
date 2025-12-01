@@ -1,6 +1,7 @@
 package com.example.tradingapp.service;
 
-import com.example.tradingapp.dto.Trade;
+import com.example.tradingapp.dto.TradeDTO;
+import com.example.tradingapp.dto.WalletDTO;
 import com.example.tradingapp.entity.CryptoPrice;
 import com.example.tradingapp.entity.User;
 import com.example.tradingapp.entity.Wallet;
@@ -37,43 +38,43 @@ class TradeServiceTest {
     @InjectMocks
     private TradeService tradeService;
 
-    private User testUser;
-    private Wallet usdtWallet;
-    private Wallet ethWallet;
-    private CryptoPrice ethPrice;
+        private User testUser;
+        private Wallet usdtWallet;
+        private Wallet ethWallet;
+        private CryptoPrice ethPrice;
 
     @BeforeEach
-    void setUp() {
-        // Create test user
-        testUser = new User();
-        testUser.setId(1L);
-        testUser.setUsername("testuser");
-        testUser.setEmail("test@example.com");
+        void setUp() {
+                // Create test user
+                testUser = new User();
+                testUser.setId(1L);
+                testUser.setUsername("testuser");
+                testUser.setEmail("test@example.com");
 
-        // Create USDT wallet
-        usdtWallet = new Wallet();
-        usdtWallet.setId(1L);
-        usdtWallet.setUser(testUser);
-        usdtWallet.setCurrency("USDT");
-        usdtWallet.setBalance(new BigDecimal("50000"));
-        usdtWallet.setAvailableBalance(new BigDecimal("50000"));
+                // Create USDT wallet
+                usdtWallet = new Wallet();
+                usdtWallet.setId(1L);
+                usdtWallet.setUser(testUser);
+                usdtWallet.setCurrency("USDT");
+                usdtWallet.setBalance(new BigDecimal("50000"));
+                usdtWallet.setAvailableBalance(new BigDecimal("50000"));
 
-        // Create ETH wallet
-        ethWallet = new Wallet();
-        ethWallet.setId(2L);
-        ethWallet.setUser(testUser);
-        ethWallet.setCurrency("ETH");
-        ethWallet.setBalance(new BigDecimal("0"));
-        ethWallet.setAvailableBalance(new BigDecimal("0"));
+                // Create ETH wallet
+                ethWallet = new Wallet();
+                ethWallet.setId(2L);
+                ethWallet.setUser(testUser);
+                ethWallet.setCurrency("ETH");
+                ethWallet.setBalance(BigDecimal.ZERO);
+                ethWallet.setAvailableBalance(BigDecimal.ZERO);
 
-        // Create ETH price data
-        ethPrice = new CryptoPrice();
-        ethPrice.setId(1L);
-        ethPrice.setSymbol("ETHUSDT");
-        ethPrice.setAskPrice(new BigDecimal("3000"));
-        ethPrice.setBidPrice(new BigDecimal("2999"));
-        ethPrice.setTimestamp(LocalDateTime.now());
-    }
+                // Create ETH price data
+                ethPrice = new CryptoPrice();
+                ethPrice.setId(1L);
+                ethPrice.setSymbol("ETHUSDT");
+                ethPrice.setAskPrice(new BigDecimal("3000"));
+                ethPrice.setBidPrice(new BigDecimal("2999"));
+                ethPrice.setTimestamp(LocalDateTime.now());
+        }
 
     @Test
     void testExecuteBuyTrade_Success() {
@@ -92,7 +93,7 @@ class TradeServiceTest {
                 });
 
         // Act
-        Trade trade = tradeService.executeTrade(testUser, "ETHUSDT", "BUY", new BigDecimal("1"));
+        TradeDTO trade = tradeService.executeTrade(testUser, "ETHUSDT", "BUY", new BigDecimal("1"));
 
         // Assert
         assertNotNull(trade);
@@ -174,7 +175,7 @@ class TradeServiceTest {
                 });
 
         // Act
-        Trade trade = tradeService.executeTrade(testUser, "ETHUSDT", "SELL", new BigDecimal("1"));
+        TradeDTO trade = tradeService.executeTrade(testUser, "ETHUSDT", "SELL", new BigDecimal("1"));
 
         // Assert
         assertNotNull(trade);

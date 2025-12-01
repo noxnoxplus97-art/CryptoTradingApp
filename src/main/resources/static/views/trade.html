@@ -156,10 +156,10 @@
                             <tr ng-repeat="trade in recentTrades | limitTo:5">
                                 <td>{{trade.timestamp | date:'HH:mm:ss'}}</td>
                                 <td>
-                                    <span ng-if="trade.tradeType === 'BUY'" class="label label-success">
+                                    <span ng-if="trade.type === 'BUY'" class="label label-success">
                                         <i class="fa fa-arrow-up"></i> BUY
                                     </span>
-                                    <span ng-if="trade.tradeType === 'SELL'" class="label label-danger">
+                                    <span ng-if="trade.type === 'SELL'" class="label label-danger">
                                         <i class="fa fa-arrow-down"></i> SELL
                                     </span>
                                 </td>

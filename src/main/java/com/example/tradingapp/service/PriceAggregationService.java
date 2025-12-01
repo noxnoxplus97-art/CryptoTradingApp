@@ -137,4 +137,66 @@ public class PriceAggregationService {
         return cryptoPriceRepository.findLatestBySymbol(symbol)
                 .orElseThrow(() -> new RuntimeException("No price data available for symbol: " + symbol));
     }
+
+    /*
+    IF INTERNAL PRICE GENERATION
+    private void generateInternalPrices() {
+        log.debug("Generating internal prices...");
+        
+        try {
+            // Process each relevant symbol
+            String[] symbols = {"ETHUSDT", "BTCUSDT"};
+            
+            for (String symbol : symbols) {
+                // 1. Get the last recorded price for this symbol
+                java.util.Optional<CryptoPrice> lastPriceOpt = cryptoPriceRepository.findLatestBySymbol(symbol);
+                
+                if (lastPriceOpt.isPresent()) {
+                    CryptoPrice lastPrice = lastPriceOpt.get();
+                    
+                    // 2. Generate small random change between -2% and +2%
+                    double changePercent = (Math.random() * 4.0) - 2.0; // Range: -2% to +2%
+                    BigDecimal changeMultiplier = BigDecimal.ONE.add(
+                        new BigDecimal(changePercent).divide(new BigDecimal("100"), 8, java.math.RoundingMode.HALF_UP)
+                    );
+                    
+                    // 3. Calculate new bid and ask prices
+                    BigDecimal newBidPrice = lastPrice.getBidPrice()
+                        .multiply(changeMultiplier)
+                        .setScale(8, java.math.RoundingMode.HALF_UP);
+                    
+                    BigDecimal newAskPrice = lastPrice.getAskPrice()
+                        .multiply(changeMultiplier)
+                        .setScale(8, java.math.RoundingMode.HALF_UP);
+                    
+                    // 4. Ensure ask price is always higher than bid (realistic spread)
+                    BigDecimal spreadAmount = new BigDecimal("1.00"); // Fixed spread of 1 unit
+                    if (newAskPrice.compareTo(newBidPrice) <= 0) {
+                        newAskPrice = newBidPrice.add(spreadAmount);
+                    }
+                    
+                    // 5. Create and save new internal price record
+                    CryptoPrice internalPrice = new CryptoPrice();
+                    internalPrice.setSymbol(symbol);
+                    internalPrice.setBidPrice(newBidPrice);
+                    internalPrice.setAskPrice(newAskPrice);
+                    internalPrice.setTimestamp(LocalDateTime.now());
+                    internalPrice.setSource("INTERNAL"); // Mark as internally generated
+                    
+                    // 6. Save to database
+                    cryptoPriceRepository.save(internalPrice);
+                    
+                    log.debug("Generated internal price for {}: Bid={}, Ask={}", 
+                        symbol, newBidPrice, newAskPrice);
+                    
+                } else {
+                    log.warn("No price history found for symbol: {}. Please initialize prices via DataInitializer.", symbol);
+                }
+            }
+            
+        } catch (Exception e) {
+            log.error("Error generating internal prices: ", e);
+        }
+    }
+    */
 }

@@ -8,13 +8,13 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TradeTest {
+class TradeDTOTest {
 
-    private Trade trade;
+    private TradeDTO trade;
 
     @BeforeEach
     void setUp() {
-        trade = new Trade();
+        trade = new TradeDTO();
     }
 
     @Test
@@ -89,11 +89,11 @@ class TradeTest {
     @Test
     void testTradeEquality() {
         // Arrange
-        Trade trade1 = new Trade();
+        TradeDTO trade1 = new TradeDTO();
         trade1.setId(1L);
         trade1.setSymbol("BTCUSDT");
 
-        Trade trade2 = new Trade();
+        TradeDTO trade2 = new TradeDTO();
         trade2.setId(1L);
         trade2.setSymbol("BTCUSDT");
 

@@ -7,13 +7,13 @@ import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class WalletTest {
+class WalletDTOTest {
 
-    private Wallet wallet;
+    private WalletDTO wallet;
 
     @BeforeEach
     void setUp() {
-        wallet = new Wallet();
+        wallet = new WalletDTO();
     }
 
     @Test
@@ -96,11 +96,11 @@ class WalletTest {
     @Test
     void testWalletEquality() {
         // Arrange
-        Wallet wallet1 = new Wallet();
+        WalletDTO wallet1 = new WalletDTO();
         wallet1.setId(1L);
         wallet1.setCurrency("USDT");
 
-        Wallet wallet2 = new Wallet();
+        WalletDTO wallet2 = new WalletDTO();
         wallet2.setId(1L);
         wallet2.setCurrency("USDT");
 

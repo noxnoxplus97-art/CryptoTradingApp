@@ -7,8 +7,16 @@ tradingApp.controller('HistoryController', ['$scope', '$interval', 'APIService',
     $scope.loading = true;
     $scope.error = null;
 
-    $scope.sortBy = 'timestamp';
-    $scope.sortReverse = true;
+    // Use names expected by the view
+    $scope.sortColumn = 'timestamp';
+    $scope.reverseSort = true;
+    $scope.stats = {
+        buyCount: 0,
+        sellCount: 0,
+        buyVolume: 0.0,
+        sellVolume: 0.0,
+        totalVolume: 0.0
+    };
 
     $scope.loadTradeHistory = function() {
         $scope.loading = true;
@@ -39,36 +47,52 @@ tradingApp.controller('HistoryController', ['$scope', '$interval', 'APIService',
                 return trade.symbol === $scope.selectedSymbol;
             });
         }
+        // Compute stats
+        var buyCount = 0, sellCount = 0, buyVolume = 0.0, sellVolume = 0.0, totalVolume = 0.0;
+        $scope.filteredTrades.forEach(function(trade) {
+            var amt = parseFloat(trade.totalAmount || 0);
+            totalVolume += amt;
+            if (trade.type === 'BUY') {
+                buyCount++; buyVolume += amt;
+            } else if (trade.type === 'SELL') {
+                sellCount++; sellVolume += amt;
+            }
+        });
+        $scope.stats.buyCount = buyCount;
+        $scope.stats.sellCount = sellCount;
+        $scope.stats.buyVolume = buyVolume;
+        $scope.stats.sellVolume = sellVolume;
+        $scope.stats.totalVolume = totalVolume;
+
+        $scope.lastUpdate = new Date();
+
         $scope.sortTrades();
     };
 
     $scope.sortTrades = function() {
         $scope.filteredTrades.sort(function(a, b) {
-            var aVal = a[$scope.sortBy];
-            var bVal = b[$scope.sortBy];
+            var aVal = a[$scope.sortColumn];
+            var bVal = b[$scope.sortColumn];
 
-            if ($scope.sortBy === 'timestamp') {
+            if ($scope.sortColumn === 'timestamp') {
                 aVal = new Date(aVal);
                 bVal = new Date(bVal);
-            } else {
-                aVal = parseFloat(aVal);
-                bVal = parseFloat(bVal);
+                return $scope.reverseSort ? bVal - aVal : aVal - bVal;
             }
 
-            if ($scope.sortReverse) {
-                return bVal - aVal;
-            } else {
-                return aVal - bVal;
-            }
+            aVal = parseFloat(aVal || 0);
+            bVal = parseFloat(bVal || 0);
+
+            return $scope.reverseSort ? bVal - aVal : aVal - bVal;
         });
     };
 
-    $scope.setSortBy = function(field) {
-        if ($scope.sortBy === field) {
-            $scope.sortReverse = !$scope.sortReverse;
+    $scope.setSortColumn = function(field) {
+        if ($scope.sortColumn === field) {
+            $scope.reverseSort = !$scope.reverseSort;
         } else {
-            $scope.sortBy = field;
-            $scope.sortReverse = true;
+            $scope.sortColumn = field;
+            $scope.reverseSort = true;
         }
         $scope.sortTrades();
     };
@@ -82,31 +106,15 @@ tradingApp.controller('HistoryController', ['$scope', '$interval', 'APIService',
     };
 
     $scope.getTotalTradeVolume = function() {
-        var total = 0;
-        $scope.filteredTrades.forEach(function(trade) {
-            total += parseFloat(trade.totalAmount);
-        });
-        return total.toFixed(2);
+        return $scope.stats.totalVolume.toFixed(2);
     };
 
     $scope.getTotalBuyVolume = function() {
-        var total = 0;
-        $scope.filteredTrades.forEach(function(trade) {
-            if (trade.tradeType === 'BUY') {
-                total += parseFloat(trade.totalAmount);
-            }
-        });
-        return total.toFixed(2);
+        return $scope.stats.buyVolume.toFixed(2);
     };
 
     $scope.getTotalSellVolume = function() {
-        var total = 0;
-        $scope.filteredTrades.forEach(function(trade) {
-            if (trade.tradeType === 'SELL') {
-                total += parseFloat(trade.totalAmount);
-            }
-        });
-        return total.toFixed(2);
+        return $scope.stats.sellVolume.toFixed(2);
     };
 
     // Load data on controller init

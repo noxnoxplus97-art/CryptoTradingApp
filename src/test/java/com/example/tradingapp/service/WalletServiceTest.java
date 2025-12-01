@@ -1,7 +1,8 @@
 package com.example.tradingapp.service;
 
-import com.example.tradingapp.dto.Wallet;
+import com.example.tradingapp.dto.WalletDTO;
 import com.example.tradingapp.entity.User;
+import com.example.tradingapp.entity.Wallet;
 import com.example.tradingapp.repository.WalletRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,7 +61,7 @@ class WalletServiceTest {
                 .thenReturn(mockWallets);
 
         // Act
-        List<Wallet> wallets = walletService.getUserWallets(testUser);
+        List<com.example.tradingapp.dto.WalletDTO> wallets = walletService.getUserWallets(testUser);
 
         // Assert
         assertNotNull(wallets);
@@ -78,7 +79,7 @@ class WalletServiceTest {
                 .thenReturn(List.of());
 
         // Act
-        List<Wallet> wallets = walletService.getUserWallets(testUser);
+        List<com.example.tradingapp.dto.WalletDTO> wallets = walletService.getUserWallets(testUser);
 
         // Assert
         assertNotNull(wallets);
@@ -101,7 +102,7 @@ class WalletServiceTest {
                 .thenReturn(Optional.of(usdtWallet));
 
         // Act
-        Wallet wallet = walletService.getWalletByCurrency(testUser, "USDT");
+        com.example.tradingapp.dto.WalletDTO wallet = walletService.getWalletByCurrency(testUser, "USDT");
 
         // Assert
         assertNotNull(wallet);
@@ -140,7 +141,7 @@ class WalletServiceTest {
                 .thenReturn(Optional.of(ethWallet));
 
         // Act
-        Wallet wallet = walletService.getWalletByCurrency(testUser, "ETH");
+        com.example.tradingapp.dto.WalletDTO wallet = walletService.getWalletByCurrency(testUser, "ETH");
 
         // Assert
         assertNotNull(wallet);

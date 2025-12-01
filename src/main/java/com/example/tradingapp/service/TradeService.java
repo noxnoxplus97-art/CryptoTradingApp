@@ -1,6 +1,7 @@
 package com.example.tradingapp.service;
 
-import com.example.tradingapp.dto.Trade;
+import com.example.tradingapp.dto.TradeDTO;
+import com.example.tradingapp.entity.Trade;
 import com.example.tradingapp.entity.User;
 import com.example.tradingapp.entity.Wallet;
 import com.example.tradingapp.repository.TradeRepository;
@@ -31,7 +32,7 @@ public class TradeService {
     private CryptoPriceRepository cryptoPriceRepository;
 
     @Transactional
-    public Trade executeTrade(User user, String symbol, String tradeType, BigDecimal quantity) {
+    public TradeDTO executeTrade(User user, String symbol, String tradeType, BigDecimal quantity) {
         // Validate symbol
         if (!isValidSymbol(symbol)) {
             throw new IllegalArgumentException("Invalid trading symbol: " + symbol);
@@ -104,33 +105,33 @@ public class TradeService {
         }
 
         // Save trade record
-        com.example.tradingapp.entity.Trade tradeEntity = new com.example.tradingapp.entity.Trade();
+        Trade tradeEntity = new Trade();
         tradeEntity.setUser(user);
         tradeEntity.setSymbol(symbol);
-        tradeEntity.setType(com.example.tradingapp.entity.Trade.TradeType.valueOf(tradeType.toUpperCase()));
+        tradeEntity.setType(Trade.TradeType.valueOf(tradeType.toUpperCase()));
         tradeEntity.setQuantity(quantity);
         tradeEntity.setPrice(tradePrice);
         tradeEntity.setTotalAmount(totalAmount);
         tradeEntity.setTimestamp(LocalDateTime.now());
         tradeEntity.setStatus("COMPLETED");
 
-        com.example.tradingapp.entity.Trade savedTrade = tradeRepository.save(tradeEntity);
+        Trade savedTrade = tradeRepository.save(tradeEntity);
 
         return mapToDto(savedTrade);
     }
 
-    public List<Trade> getUserTradeHistory(User user) {
-        List<com.example.tradingapp.entity.Trade> trades = tradeRepository.findByUserOrderByTimestampDesc(user);
+    public List<TradeDTO> getUserTradeHistory(User user) {
+        List<Trade> trades = tradeRepository.findByUserOrderByTimestampDesc(user);
         return trades.stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
-    public List<Trade> getUserTradeHistoryBySymbol(User user, String symbol) {
-        List<com.example.tradingapp.entity.Trade> trades = tradeRepository.findByUserAndSymbolOrderByTimestampDesc(user, symbol);
+    public List<TradeDTO> getUserTradeHistoryBySymbol(User user, String symbol) {
+        List<Trade> trades = tradeRepository.findByUserAndSymbolOrderByTimestampDesc(user, symbol);
         return trades.stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
-    private Trade mapToDto(com.example.tradingapp.entity.Trade entity) {
-        Trade dto = new Trade();
+    private TradeDTO mapToDto(Trade entity) {
+        TradeDTO dto = new TradeDTO();
         dto.setId(entity.getId());
         dto.setSymbol(entity.getSymbol());
         dto.setType(entity.getType().toString());

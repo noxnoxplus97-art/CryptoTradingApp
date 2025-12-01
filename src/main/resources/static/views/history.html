@@ -149,12 +149,12 @@
                                             <i class="fa fa-sort-down" ng-if="sortColumn === 'timestamp' && reverseSort"></i>
                                         </a>
                                     </th>
-                                    <th ng-click="setSortColumn('tradeType')">
+                                    <th ng-click="setSortColumn('type')">
                                         <a href="">
                                             Type
-                                            <i class="fa fa-sort" ng-if="sortColumn !== 'tradeType'"></i>
-                                            <i class="fa fa-sort-up" ng-if="sortColumn === 'tradeType' && !reverseSort"></i>
-                                            <i class="fa fa-sort-down" ng-if="sortColumn === 'tradeType' && reverseSort"></i>
+                                            <i class="fa fa-sort" ng-if="sortColumn !== 'type'"></i>
+                                            <i class="fa fa-sort-up" ng-if="sortColumn === 'type' && !reverseSort"></i>
+                                            <i class="fa fa-sort-down" ng-if="sortColumn === 'type' && reverseSort"></i>
                                         </a>
                                     </th>
                                     <th ng-click="setSortColumn('symbol')">
@@ -195,10 +195,10 @@
                                 <tr ng-repeat="trade in trades | orderBy:sortColumn:reverseSort">
                                     <td>{{trade.timestamp | date:'MM/dd/yyyy HH:mm:ss'}}</td>
                                     <td>
-                                        <span ng-if="trade.tradeType === 'BUY'" class="label label-success">
+                                        <span ng-if="trade.type === 'BUY'" class="label label-success">
                                             <i class="fa fa-arrow-up"></i> BUY
                                         </span>
-                                        <span ng-if="trade.tradeType === 'SELL'" class="label label-danger">
+                                        <span ng-if="trade.type === 'SELL'" class="label label-danger">
                                             <i class="fa fa-arrow-down"></i> SELL
                                         </span>
                                     </td>

@@ -65,11 +65,11 @@ src/
 │   │   │   ├── TradeRepository.java
 │   │   │   └── WalletRepository.java
 │   │   └── dto/
-│   │       ├── Trade.java (DTO)
-│   │       ├── Wallet.java (DTO)
-│   │       ├── TradeRequest.java
-│   │       ├── PriceResponse.java
-│   │       └── ApiResponse.java
+│   │       ├── TradeDTO.java
+│   │       ├── WalletDTO.java
+│   │       ├── TradeRequestDTO.java
+│   │       ├── PriceResponseDTO.java
+│   │       └── ApiResponseDTO.java
 │   └── resources/
 │       └── application.properties
 ```
@@ -115,168 +115,90 @@ CREATE TABLE trades (
 );
 ```
 
-### CryptoPrices Table
-```sql
-CREATE TABLE crypto_prices (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    symbol VARCHAR(20) NOT NULL,
-    bid_price DECIMAL(18, 8) NOT NULL,
-    ask_price DECIMAL(18, 8) NOT NULL,
-    timestamp DATETIME NOT NULL,
-    source VARCHAR(20) NOT NULL,
-    bid_qty DECIMAL(18, 8),
-    ask_qty DECIMAL(18, 8),
-    INDEX idx_symbol_timestamp (symbol, timestamp DESC)
-);
-```
+"""
+# Crypto Trading System
 
-## REST API Endpoints
+This repository contains a simple crypto trading backend (Spring Boot) and a lightweight AngularJS (1.x) frontend used for demos and learning.
 
-### 1. Get Latest Aggregated Price
-```
-GET /api/price/{symbol}
+This README focuses on quick start steps and developer guidance. Full frontend documentation is in `FRONTEND_DOCUMENTATION.md`.
 
-Parameters:
-- symbol: ETHUSDT or BTCUSDT
+## Quickstart (developer)
 
-Response:
-{
-    "success": true,
-    "message": "Success",
-    "data": {
-        "symbol": "ETHUSDT",
-        "bidPrice": 2000.50,
-        "askPrice": 2001.50,
-        "timestamp": "2024-01-15 10:30:45"
-    }
-}
-```
-
-### 2. Execute Trade
-```
-POST /api/trade
-
-Request Body:
-{
-    "symbol": "ETHUSDT",
-    "type": "BUY",
-    "quantity": 1.5
-}
-
-Response:
-{
-    "success": true,
-    "message": "Trade executed successfully",
-    "data": {
-        "id": 1,
-        "symbol": "ETHUSDT",
-        "type": "BUY",
-        "quantity": 1.5,
-        "price": 2001.50,
-        "totalAmount": 3002.25,
-        "timestamp": "2024-01-15 10:30:45",
-        "status": "COMPLETED"
-    }
-}
-```
-
-### 3. Get User's Wallet Balance
-```
-GET /api/wallet
-
-Response:
-{
-    "success": true,
-    "message": "Success",
-    "data": [
-        {
-            "id": 1,
-            "currency": "USDT",
-            "balance": 46997.75,
-            "availableBalance": 46997.75
-        },
-        {
-            "id": 2,
-            "currency": "ETH",
-            "balance": 1.5,
-            "availableBalance": 1.5
-        },
-        {
-            "id": 3,
-            "currency": "BTC",
-            "balance": 0,
-            "availableBalance": 0
-        }
-    ]
-}
-```
-
-### 4. Get User's Trading History
-```
-GET /api/trades
-
-Response:
-{
-    "success": true,
-    "message": "Success",
-    "data": [
-        {
-            "id": 1,
-            "symbol": "ETHUSDT",
-            "type": "BUY",
-            "quantity": 1.5,
-            "price": 2001.50,
-            "totalAmount": 3002.25,
-            "timestamp": "2024-01-15 10:30:45",
-            "status": "COMPLETED"
-        }
-    ]
-}
-```
-
-### 5. Get Trading History by Symbol
-```
-GET /api/trades/{symbol}
-
-Parameters:
-- symbol: ETHUSDT or BTCUSDT
-
-Response: (Same format as above, filtered by symbol)
-```
-
-### 6. Health Check
-```
-GET /api/health
-
-Response:
-{
-    "success": true,
-    "message": "Crypto Trading App is running",
-    "data": null
-}
-```
-
-## Requirements
-
-- Java 17+
+Prerequisites:
+- Java 17
 - Maven 3.6+
 
-## Build
-
-Using a local Maven installation:
+Build and run (from project root):
 
 ```powershell
 mvn -DskipTests package
-```
-
-Run
-
-```powershell
 mvn spring-boot:run
 ```
 
-Try the sample endpoint:
+Or run the packaged JAR:
 
 ```powershell
-curl http://localhost:8080/api/hello
+mvn -DskipTests package
+java -jar target\*.jar
 ```
+
+Open the application in a browser: http://localhost:8080
+
+H2 Console: http://localhost:8080/h2-console
+ - JDBC URL (default in-memory): `jdbc:h2:mem:tradingdb`
+ - User: `sa` (no password)
+
+Notes about the database:
+- By default the app uses an in-memory H2 database (fast for local development). Data is lost when the process stops.
+
+Quick API examples:
+
+Get latest price for ETH:
+
+```powershell
+curl http://localhost:8080/api/price/ETHUSDT
+```
+
+Execute a trade (BUY 1.5 ETH):
+
+```powershell
+curl -H "Content-Type: application/json" -X POST -d "{\"symbol\":\"ETHUSDT\",\"type\":\"BUY\",\"quantity\":1.5}" http://localhost:8080/api/trade
+```
+
+View wallets:
+
+```powershell
+curl http://localhost:8080/api/wallet
+```
+
+## Project layout (short)
+
+Key folders:
+
+- `src/main/java` – Java backend (controllers, services, repositories, entities)
+- `src/main/resources/application.properties` – Spring Boot properties (H2 config)
+- `src/main/resources/static` – frontend static files (AngularJS app, views, CSS)
+
+Frontend quick notes:
+- AngularJS app script: `src/main/resources/static/js/app.js`
+- Controllers: `src/main/resources/static/js/controllers/`
+- Services: `src/main/resources/static/js/services/`
+- Views/Templates: `src/main/resources/static/views/`
+
+For a full frontend reference, read `FRONTEND_DOCUMENTATION.md`.
+
+## Development tips
+
+- If you enable file-based H2 and want to migrate data from a running in-memory instance, use the H2 console's `SCRIPT TO 'C:/path/dump.sql'` on the running JVM, then `RUNSCRIPT FROM 'C:/path/dump.sql'` after switching to file-based.
+- `spring.jpa.hibernate.ddl-auto` is set to `create-drop` for in-memory default; if you persist data, consider `update` or `validate` depending on your needs.
+
+## Next steps (optional tasks you can ask me to do)
+
+- Add a property `app.data.initializer.enabled` and make `DataInitializer` respect it (disable reseeding after first run).
+- Enable file-based H2 by default and create migration helpers.
+- Add a small README for frontend dev workflow and testing.
+
+---
+Updated documentation and a dedicated frontend doc are included in the repository.
+"""
+            "id": 3,

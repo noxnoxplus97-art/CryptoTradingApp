@@ -1,10 +1,10 @@
 package com.example.tradingapp.controller;
 
-import com.example.tradingapp.dto.ApiResponse;
-import com.example.tradingapp.dto.PriceResponse;
-import com.example.tradingapp.dto.Trade;
-import com.example.tradingapp.dto.TradeRequest;
-import com.example.tradingapp.dto.Wallet;
+import com.example.tradingapp.dto.ApiResponseDTO;
+import com.example.tradingapp.dto.PriceResponseDTO;
+import com.example.tradingapp.dto.TradeDTO;
+import com.example.tradingapp.dto.TradeRequestDTO;
+import com.example.tradingapp.dto.WalletDTO;
 import com.example.tradingapp.entity.CryptoPrice;
 import com.example.tradingapp.entity.User;
 import com.example.tradingapp.repository.UserRepository;
@@ -71,7 +71,7 @@ class MainControllerTest {
                 .thenReturn(ethPrice);
 
         // Act
-        ResponseEntity<ApiResponse<PriceResponse>> response = mainController.getLatestPrice("ETHUSDT");
+        ResponseEntity<com.example.tradingapp.dto.ApiResponseDTO<com.example.tradingapp.dto.PriceResponseDTO>> response = mainController.getLatestPrice("ETHUSDT");
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -91,7 +91,7 @@ class MainControllerTest {
                 .thenThrow(new RuntimeException("Price not found"));
 
         // Act
-        ResponseEntity<ApiResponse<PriceResponse>> response = mainController.getLatestPrice("INVALID");
+        ResponseEntity<com.example.tradingapp.dto.ApiResponseDTO<com.example.tradingapp.dto.PriceResponseDTO>> response = mainController.getLatestPrice("INVALID");
 
         // Assert
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -103,12 +103,12 @@ class MainControllerTest {
     @Test
     void testExecuteTrade_Success() {
         // Arrange
-        TradeRequest request = new TradeRequest();
+        TradeRequestDTO request = new TradeRequestDTO();
         request.setSymbol("ETHUSDT");
         request.setType("BUY");
         request.setQuantity(new BigDecimal("1"));
 
-        Trade tradeDto = new Trade();
+        TradeDTO tradeDto = new TradeDTO();
         tradeDto.setId(1L);
         tradeDto.setSymbol("ETHUSDT");
         tradeDto.setType("BUY");
@@ -122,7 +122,7 @@ class MainControllerTest {
                 .thenReturn(tradeDto);
 
         // Act
-        ResponseEntity<ApiResponse<Trade>> response = mainController.executeTrade(request);
+        ResponseEntity<com.example.tradingapp.dto.ApiResponseDTO<com.example.tradingapp.dto.TradeDTO>> response = mainController.executeTrade(request);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -138,7 +138,7 @@ class MainControllerTest {
     @Test
     void testExecuteTrade_UserNotFound() {
         // Arrange
-        TradeRequest request = new TradeRequest();
+        TradeRequestDTO request = new TradeRequestDTO();
         request.setSymbol("ETHUSDT");
         request.setType("BUY");
         request.setQuantity(new BigDecimal("1"));
@@ -147,7 +147,7 @@ class MainControllerTest {
                 .thenReturn(Optional.empty());
 
         // Act
-        ResponseEntity<ApiResponse<Trade>> response = mainController.executeTrade(request);
+        ResponseEntity<com.example.tradingapp.dto.ApiResponseDTO<com.example.tradingapp.dto.TradeDTO>> response = mainController.executeTrade(request);
 
         // Assert
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -159,17 +159,20 @@ class MainControllerTest {
     @Test
     void testGetWalletBalance_Success() {
         // Arrange
-        Wallet usdtWallet = new Wallet();
+        com.example.tradingapp.entity.Wallet usdtWallet = new com.example.tradingapp.entity.Wallet();
         usdtWallet.setCurrency("USDT");
         usdtWallet.setBalance(new BigDecimal("50000"));
         usdtWallet.setAvailableBalance(new BigDecimal("50000"));
 
-        Wallet ethWallet = new Wallet();
+        com.example.tradingapp.entity.Wallet ethWallet = new com.example.tradingapp.entity.Wallet();
         ethWallet.setCurrency("ETH");
         ethWallet.setBalance(new BigDecimal("1.5"));
         ethWallet.setAvailableBalance(new BigDecimal("1.5"));
 
-        List<Wallet> wallets = List.of(usdtWallet, ethWallet);
+        List<com.example.tradingapp.dto.WalletDTO> wallets = List.of(
+            new com.example.tradingapp.dto.WalletDTO(1L, "USDT", new BigDecimal("50000"), new BigDecimal("50000")),
+            new com.example.tradingapp.dto.WalletDTO(2L, "ETH", new BigDecimal("1.5"), new BigDecimal("1.5"))
+        );
 
         when(userRepository.findById(1L))
                 .thenReturn(Optional.of(testUser));
@@ -177,7 +180,7 @@ class MainControllerTest {
                 .thenReturn(wallets);
 
         // Act
-        ResponseEntity<ApiResponse<List<Wallet>>> response = mainController.getWalletBalance();
+        ResponseEntity<com.example.tradingapp.dto.ApiResponseDTO<List<com.example.tradingapp.dto.WalletDTO>>> response = mainController.getWalletBalance();
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -198,7 +201,7 @@ class MainControllerTest {
                 .thenReturn(Optional.empty());
 
         // Act
-        ResponseEntity<ApiResponse<List<Wallet>>> response = mainController.getWalletBalance();
+        ResponseEntity<com.example.tradingapp.dto.ApiResponseDTO<List<com.example.tradingapp.dto.WalletDTO>>> response = mainController.getWalletBalance();
 
         // Assert
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -216,7 +219,7 @@ class MainControllerTest {
                 .thenReturn(List.of());
 
         // Act
-        ResponseEntity<ApiResponse<List<Wallet>>> response = mainController.getWalletBalance();
+        ResponseEntity<com.example.tradingapp.dto.ApiResponseDTO<List<com.example.tradingapp.dto.WalletDTO>>> response = mainController.getWalletBalance();
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());

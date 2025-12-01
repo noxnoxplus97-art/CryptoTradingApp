@@ -1,15 +1,15 @@
 package com.example.tradingapp.dto;
 
+import java.math.BigDecimal;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Wallet {
+public class WalletDTO {
     private Long id;
     private String currency;
     private BigDecimal balance;
