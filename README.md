@@ -29,14 +29,23 @@ A Spring Boot-based cryptocurrency trading application that aggregates real-time
 
 ## Technology Stack
 
+### Backend Stack
 - **Framework**: Spring Boot 3.2.2
-- **Java Version**: 17
-- **Database**: H2 (in-memory)
-- **ORM**: Spring Data JPA / Hibernate
-- **Build Tool**: Maven
-- **HTTP Client**: RestTemplate
-- **Logging**: SLF4J
-- **Additional**: Lombok (annotations for getters/setters)
+- **Language**: Java 17
+- **Database**: H2 In-Memory Database with Hibernate ORM
+- **Build Tool**: Maven 3.8+
+- **Dependencies**:
+  - Spring Data JPA
+  - Lombok (code generation)
+  - RestTemplate (HTTP calls)
+  - Scheduled Task Execution
+
+### Frontend Stack
+- **Framework**: AngularJS 1.6.9 (CDN-based)
+- **UI Framework**: Bootstrap 3.3.7
+- **Icons**: Font Awesome 4.7.0
+- **Routing**: AngularJS Route (ng-route)
+- **Architecture**: MVC with Service Layer
 
 ## Project Structure
 
@@ -185,20 +194,93 @@ Frontend quick notes:
 - Services: `src/main/resources/static/js/services/`
 - Views/Templates: `src/main/resources/static/views/`
 
-For a full frontend reference, read `FRONTEND_DOCUMENTATION.md`.
+## 🎨 Frontend Features
 
-## Development tips
+### Default Credentials
+```
+Access the Application: http://localhost:8080
+Username: testuser
+Password: password
+```
 
-- If you enable file-based H2 and want to migrate data from a running in-memory instance, use the H2 console's `SCRIPT TO 'C:/path/dump.sql'` on the running JVM, then `RUNSCRIPT FROM 'C:/path/dump.sql'` after switching to file-based.
-- `spring.jpa.hibernate.ddl-auto` is set to `create-drop` for in-memory default; if you persist data, consider `update` or `validate` depending on your needs.
+### 1. **Login Page** (`/login`)
+- Clean login interface with demo credentials
+- Auto-fill button for quick testing
+- Session persistence via localStorage
+- Error message handling
 
-## Next steps (optional tasks you can ask me to do)
+### 2. **Dashboard** (`/dashboard`)
+- **Portfolio Summary**:
+  - Total wallet balance in USD
+  - Individual asset balances
+  - Available vs locked balances
+  - Real-time price display
 
-- Add a property `app.data.initializer.enabled` and make `DataInitializer` respect it (disable reseeding after first run).
-- Enable file-based H2 by default and create migration helpers.
-- Add a small README for frontend dev workflow and testing.
+- **Market Prices**:
+  - Current bid/ask prices
+  - Spread percentage calculation
+  - Auto-refresh every 10 seconds
 
----
-Updated documentation and a dedicated frontend doc are included in the repository.
-"""
-            "id": 3,
+### 3. **Trading** (`/trade`)
+- **Trade Execution**:
+  - Buy/Sell toggle buttons
+  - Symbol selection (ETH/USDT, BTC/USDT)
+  - Real-time price loading
+  - Quantity input with step validation
+  - Auto-calculated total amount
+  - Available balance display
+  - Form validation with error messages
+
+- **Recent Trades Summary**:
+  - Last 5 trades display
+  - Color-coded buy/sell orders
+
+### 4. **History** (`/history`)
+- **Advanced Filtering & Sorting**:
+  - Filter by symbol (All/ETHUSDT/BTCUSDT)
+  - Click column headers to sort
+  - Reverse sort toggle
+  - Auto-refresh every 10 seconds
+
+- **Statistics Dashboard**:
+  - Total trades count
+  - Buy/Sell order breakdown
+  - Total trading volume
+  - Volume by type (Buy/Sell)
+  - Net flow calculation
+
+- **Trade Details Table**:
+  - Timestamp, type, symbol, quantity, price, total
+  - Color-coded labels (green=BUY, red=SELL)
+  - Responsive table design
+
+### 5. **Account** (`/account`)
+- **User Information**:
+  - Username display
+  - Member since date
+  - Refresh button
+
+- **Portfolio Summary**:
+  - Total assets value (USD)
+  - Total available balance
+  - Asset count
+  - Largest position tracking
+
+- **Detailed Wallet Breakdown**:
+  - Asset-by-asset balance display
+  - Total, available, locked balances
+  - USD conversion per asset
+  - Portfolio percentage breakdown
+  - Visual progress bars
+
+- **Asset Distribution**:
+  - Graphical portfolio distribution
+  - Color-coded assets
+  - Percentage and USD value display
+
+- **Trading Activity**:
+  - Total trades, buy orders, sell orders
+  - Quick statistics display
+
+
+
